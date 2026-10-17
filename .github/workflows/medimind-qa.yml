@@ -1,0 +1,63 @@
+name: MediMind browser QA
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Authorized MediMind URL"
+        required: false
+        default: "https://medimind-web-production.up.railway.app"
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      MEDIMIND_URL: ${{ inputs.base_url || vars.MEDIMIND_URL || 'https://medimind-web-production.up.railway.app' }}
+      AXE_CORE_JS: ${{ github.workspace }}/vendor/axe.min.js
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install pinned Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Install Chromium and system libraries
+        run: python -m playwright install --with-deps chromium
+      - name: Install verified axe-core
+        run: |
+          mkdir -p vendor
+          npm view axe-core@4.10.3 version --registry=https://registry.npmjs.org/
+          npm pack axe-core@4.10.3 --pack-destination vendor --registry=https://registry.npmjs.org/
+          tar -xzf vendor/axe-core-4.10.3.tgz -C vendor package/axe.min.js
+          mv vendor/package/axe.min.js vendor/axe.min.js
+          rm -rf vendor/package vendor/axe-core-4.10.3.tgz
+      - name: Verify Chromium launches
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              print("Chromium launched:", browser.version)
+              browser.close()
+          PY
+      - name: Compile and collect all 17 scenarios
+        run: |
+          python -m compileall -q conftest.py tests
+          python -m pytest --collect-only -q tests
+      - name: Run browser suite
+        run: |
+          mkdir -p artifacts
+          python -m pytest tests -v --tb=short --maxfail=0 \
+            --html=artifacts/report.html --self-contained-html \
+            --junitxml=artifacts/junit.xml --timeout=45
+      - name: Upload artifacts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: medimind-qa-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
