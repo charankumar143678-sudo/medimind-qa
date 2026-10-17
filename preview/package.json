@@ -2,6 +2,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test health-core.test.mjs"
+    "test": "node --test health-core.test.mjs consultation-engine.test.mjs"
   }
 }
