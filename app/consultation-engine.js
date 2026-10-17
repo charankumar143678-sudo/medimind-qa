@@ -43,7 +43,7 @@ const MediMindConsultation=(()=>{
   const questions=emergency?[]:matches.flatMap(x=>x.q[l]).slice(0,4);
   if(!emergency&&!questions.length)questions.push(l==='ar'?'ما العرض الرئيسي ومتى بدأ وما شدته؟':'What is the main symptom, when did it start, and how severe is it?');
   const urgency=emergency?'emergency':matches.length?'unknown':'unknown';
-  const lines=[t.intro+': '+t.report+' '+text,
+  const lines=[(l==='ar'&&!emergency?'موضوع التقييم: ':'')+t.intro+': '+t.report+' '+text,
    emergency?t.emergency: t.unknown,
    ...(emergency?[t.uae]:[t.questions+': '+questions.join(' • '),t.possible]),
    t.disclaimer];
