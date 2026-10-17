@@ -22,7 +22,7 @@ jobs:
           assert s.startswith('<!DOCTYPE html>')
           assert 'MediMind' in s
           assert 'consult-knowledge-links' in s
-          assert 'medical-knowledge' in s
+          assert 'condition-directory' in s
           assert '<script' in s and '</html>' in s
           assert 'noindex,nofollow' in s
           print('Static preview validated:', len(s), 'characters')
