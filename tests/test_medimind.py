@@ -53,7 +53,7 @@ class MediMindBrowser(unittest.TestCase):
     def test_mobile_navigation(self):
         self.page.set_viewport_size({'width':390,'height':844})
         for section in ['home','consult','reports','nutrition','fitness']:
-            mobile_link = self.page.locator(f'.mobilebar button[onclick="go(\\'{section}\\')"]')
+            mobile_link = self.page.locator('.mobilebar button').filter(has_text={'home':'Home','consult':'Consult','reports':'Reports','nutrition':'Diet','fitness':'Fitness'}[section])
             self.assertTrue(mobile_link.is_visible(), f'Mobile navigation missing: {section}')
             mobile_link.click()
             self.assertIn('active', self.page.locator(f'section#{section}').get_attribute('class'))
