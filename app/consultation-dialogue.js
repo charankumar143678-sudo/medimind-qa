@@ -17,8 +17,9 @@ const MediMindDialogue=(()=>{
  const capture=(message)=>{
   const v=text(message);
   if(!v)return;
-  for(const d of definitions){if(d.detect?.test(v)&&!state.answers[d.id])state.answers[d.id]=v;}
-  for(const id of state.current){if(!state.answers[id]){state.answers[id]=v;break;}}
+  let matched=false;
+  for(const d of definitions){if(d.detect?.test(v)&&!state.answers[d.id]){state.answers[d.id]=v;matched=true;}}
+  if(!matched&&state.current.length===1){const id=state.current[0];if(!state.answers[id])state.answers[id]=v;}
  };
  const step=({message='',base,context={},language='en'}={})=>{
   if(!base)throw Error('Independent safety result required');
