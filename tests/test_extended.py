@@ -1,5 +1,5 @@
 """Independent synthetic-only regression checks. Never submit real patient data."""
-import os,unittest
+import os,unittest,json
 from playwright.sync_api import sync_playwright
 URL=os.environ.get('MEDIMIND_URL','https://medimind-web-production.up.railway.app')
 SECTIONS=['home','consult','reports','body','nutrition','fitness','library','vitals','uae','medsafe','profile']
@@ -67,9 +67,17 @@ class ExtendedQA(unittest.TestCase):
    self.page.locator(f'[data-page="{section}"]').first.click()
    self.page.add_script_tag(path=path)
    result=self.page.evaluate("async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})")
-   self.assertFalse(result['violations'],f'{section}: '+str([(v['id'],len(v['nodes'])) for v in result['violations']]))
+   violations=[{'id':v['id'],'impact':v.get('impact'),'count':len(v['nodes']),'targets':[n.get('target') for n in v['nodes'][:5]]} for v in result['violations']]
+   if violations:
+    os.makedirs('artifacts',exist_ok=True)
+    with open(f'artifacts/axe_wcag_{section}_en.json','w') as f:json.dump(violations,f,indent=2)
+   self.assertFalse(violations,f'{section}: {violations}')
   self.page.locator('#langtoggle').click()
   self.page.add_script_tag(path=path)
   result=self.page.evaluate("async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})")
-  self.assertFalse(result['violations'],'Arabic: '+str([(v['id'],len(v['nodes'])) for v in result['violations']]))
+  violations=[{'id':v['id'],'impact':v.get('impact'),'count':len(v['nodes']),'targets':[n.get('target') for n in v['nodes'][:5]]} for v in result['violations']]
+  if violations:
+   os.makedirs('artifacts',exist_ok=True)
+   with open('artifacts/axe_wcag_ar.json','w') as f:json.dump(violations,f,indent=2)
+  self.assertFalse(violations,f'Arabic: {violations}')
 if __name__=='__main__':unittest.main()
