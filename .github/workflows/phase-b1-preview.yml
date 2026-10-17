@@ -1,0 +1,26 @@
+name: MediMind Phase B1 preview unit tests
+on:
+  pull_request:
+    paths:
+      - 'preview/**'
+      - '.github/workflows/phase-b1-preview.yml'
+  push:
+    branches: ['phase2/phase-a-audit-and-local-core']
+    paths:
+      - 'preview/**'
+      - '.github/workflows/phase-b1-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health-core:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run synthetic health calculation tests
+        working-directory: preview
+        run: npm test
