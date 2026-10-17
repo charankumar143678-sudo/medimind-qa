@@ -1,0 +1,35 @@
+name: Phase 3 static preview validation
+on:
+  push:
+    branches: ['preview/phase3-static-pages']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify static preview is self-contained
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('preview-static/index.html')
+          s=p.read_text()
+          assert s.startswith('<!DOCTYPE html>')
+          assert 'MediMind' in s
+          assert 'consult-knowledge-links' in s
+          assert 'medical-knowledge' in s
+          assert '<script' in s and '</html>' in s
+          assert 'noindex,nofollow' in s
+          print('Static preview validated:', len(s), 'characters')
+          PY
+      - name: Upload preview website
+        uses: actions/upload-artifact@v4
+        with:
+          name: medimind-phase3-static-preview
+          path: preview-static/
+          retention-days: 14
