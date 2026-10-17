@@ -53,7 +53,20 @@ class MediMindBrowser(unittest.TestCase):
     def test_mobile_navigation(self):
         self.page.set_viewport_size({'width':390,'height':844})
         for section in ['home','consult','reports','nutrition','fitness']:
-            self.open_page(section)
+            link = self.page.locator(f'[data-page="{section}"]:visible').first
+            if link.count() == 0:
+                controls = self.page.locator(
+                    '#menuToggle:visible, #menutoggle:visible, #menu-btn:visible, '
+                    '#mobileMenuToggle:visible, .menu-toggle:visible, '
+                    '[aria-controls="sidebar"]:visible, [aria-controls="navigation"]:visible, '
+                    'button[aria-label*="menu" i]:visible'
+                )
+                self.assertGreater(controls.count(), 0, 'Mobile navigation opener not found')
+                controls.first.click()
+                link = self.page.locator(f'[data-page="{section}"]:visible').first
+            self.assertGreater(link.count(), 0, f'Navigation destination {section} not visible')
+            link.click()
+            self.assertIn('active', self.page.locator(f'section#{section}').get_attribute('class'))
     def test_empty_state_and_corrupt_storage(self):
         self.page.evaluate("localStorage.removeItem('medimind_vitals_local_v1')")
         self.page.reload()
