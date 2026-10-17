@@ -20,15 +20,15 @@ const MediMindAdaptive=(()=>{
  const buildQuestions=(base,ctx,turn)=>{
   if(base.urgency==='emergency')return [];
   const t=questionSets[ctx.language],items=[...base.questions];
-  const add=q=>{if(q&&!items.includes(q)&&items.length<5)items.push(q);};
+  const add=q=>{if(q&&!items.includes(q)&&items.length<6)items.push(q);};
   if(!ctx.duration)add(t.onset);else add(t.duration);
   if(!ctx.severity)add(t.severity);else add(t.impact);
-  if(ctx.profile.age!==null)add(t.age);
   if(ctx.profile.meds)add(t.meds);
+  if(ctx.profile.age!==null)add(t.age);
   if(ctx.profile.allergies)add(t.allergy);
   if(ctx.profile.conditions)add(t.conditions);
   if(turn>1)add(t.follow);
-  return items.slice(0,5);
+  return items.slice(0,6);
  };
  const guidance=(base,ctx)=>{
   const ar=ctx.language==='ar';
