@@ -30,3 +30,10 @@ A future LLM adapter can propose additional questions or educational text, but M
 - Browser: `tests/test_adaptive_consultation.py` in existing isolated Playwright GitHub Actions workflow.
 - Review latest exact commit and completed GitHub Actions runs before asserting pass.
 - No automatic production deployment in this phase. Production was previously explicitly authorized for Phase 3, not this new Phase 4 candidate.
+
+## Phase 4B stateful dialogue extension
+- `app/consultation-dialogue.js` stores session answers in memory, asks at most two unanswered follow-ups per step, accepts corrections, tracks progress, and interrupts on deterministic emergency signals.
+- The dialogue tracks symptom onset, severity, onset style, location, associated symptoms, daily-life impact and symptom trend. It does not infer unknown information; ambiguous free text is not force-mapped to a specific answer.
+- The summary exports patient-entered follow-up answers; the reset action clears dialogue memory.
+- Added `preview/consultation-dialogue.test.mjs` and `tests/test_consultation_dialogue.py`.
+- **Known limitation:** This is a bounded rule-based questionnaire, not clinical differential diagnosis, complete medication identification, or a validated emergency triage tool. Arabic and clinical question sequencing still require qualified review. Profile export and richer medication reference workflows are not yet implemented.
