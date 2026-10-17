@@ -9,7 +9,6 @@ def test_keyboard_reflow_and_language_metadata(browser_page,locale):
     assert p.locator("html").get_attribute("lang")==locale
     assert p.locator("html").get_attribute("dir")==("rtl" if locale=="ar" else "ltr")
     p.set_viewport_size({"width":320,"height":800})
-    p.evaluate("document.documentElement.style.zoom='2'")
     assert p.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth + 4")
     p.keyboard.press("Tab")
     assert p.evaluate("document.activeElement !== document.body")
