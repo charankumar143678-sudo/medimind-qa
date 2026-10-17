@@ -9,7 +9,7 @@ def test_opt_in_profile_context_and_questions(browser_page):
     p.locator("#chatinput").fill("headache")
     p.evaluate("sendChat()")
     assert "Profile context enabled" in p.locator("#consult-context-status").inner_text()
-    assert "medicines" in p.locator("#consult-questions").inner_text()
+    assert "current medicines" in p.locator("#chat").inner_text()
     assert p.evaluate("MediMindConsultation.getState().reported.length")==1
 
 def test_profile_default_off_and_no_new_storage(browser_page):
