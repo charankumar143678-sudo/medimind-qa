@@ -12,23 +12,25 @@ export const SUPPORTED = Object.freeze({
   glucose: { unit: 'mmol/L', min: 1, max: 40 },
   weight: { unit: 'kg', min: 1, max: 450 }
 });
-export function validateObservation(input) {
+export function validateObservation(input, now=Date.now()) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
   if (!Object.prototype.hasOwnProperty.call(SUPPORTED, input.metric)) return null;
   const limits = SUPPORTED[input.metric];
   if (typeof input.value !== 'number' || !Number.isFinite(input.value) ||
       input.value < limits.min || input.value > limits.max) return null;
+  if (typeof input.time !== 'string' || !Number.isFinite(now)) return null;
   const time = Date.parse(input.time);
   if (!Number.isFinite(time) || new Date(time).toISOString() !== input.time ||
-      time > Date.now() + 60000) return null;
+      time > now + 60000) return null;
   return Object.freeze({metric:input.metric, value:input.value, time:input.time, unit:limits.unit});
 }
 export function filterObservations(observations, metric, period, now=Date.now()) {
   if (!Object.prototype.hasOwnProperty.call(SUPPORTED,metric)) throw new RangeError('Unsupported metric');
+  // Explicit rolling windows, not calendar month/year (timezone-independent durations).
   const windows = {day:86400000,week:604800000,month:2592000000,year:31536000000};
   if (!Object.prototype.hasOwnProperty.call(windows,period)) throw new RangeError('Unsupported period');
   if (!Number.isFinite(now)) throw new TypeError('Invalid clock');
-  return observations.map(validateObservation).filter(x => x && x.metric===metric &&
+  return observations.map(x=>validateObservation(x,now)).filter(x => x && x.metric===metric &&
       Date.parse(x.time)<=now && Date.parse(x.time)>=now-windows[period])
     .sort((a,b)=>Date.parse(a.time)-Date.parse(b.time));
 }
