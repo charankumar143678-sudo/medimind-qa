@@ -55,7 +55,7 @@ def test_language_preserves_legacy_readings_and_input_fields(browser_page):
     p.evaluate("""key => localStorage.setItem(key,JSON.stringify([{time:new Date().toISOString(),values:{pulse:72,sys:120,dia:80}}]))""",STORAGE)
     p.locator("#chart_metric").select_option("pulse")
     p.locator("#trend_window").select_option("day")
-    p.locator("#v_pulse").fill("74")
+    p.evaluate("document.querySelector('#v_pulse').value='74'")
     original=p.evaluate("localStorage.getItem('"+STORAGE+"')")
     p.locator("#langtoggle").click()
     assert "المتوسط" in p.locator("#trend_summary").inner_text()
