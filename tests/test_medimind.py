@@ -1,7 +1,7 @@
 """Synthetic-only browser regression suite for MediMind Railway deployment.
 Run: MEDIMIND_URL=https://medimind-web-production.up.railway.app python -m unittest discover -s tests -v
 """
-import os, unittest
+import os, unittest, json
 from playwright.sync_api import sync_playwright
 
 URL = os.environ.get('MEDIMIND_URL','https://medimind-web-production.up.railway.app')
@@ -118,7 +118,12 @@ class MediMindBrowser(unittest.TestCase):
             self.open_page(section)
             self.page.add_script_tag(path=axe)
             result=self.page.evaluate("async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})")
-            violations=[(x['id'], [n['target'] for n in x['nodes'][:3]]) for x in result['violations']]
-            self.assertEqual([], violations, f'Accessibility violations in {section}, Arabic={arabic}')
+            violations=[{'id': x['id'], 'impact': x.get('impact'), 'count': len(x['nodes']), 'targets': [n.get('target') for n in x['nodes'][:5]]} for x in result['violations']]
+            if violations:
+                os.makedirs('artifacts', exist_ok=True)
+                label = 'ar' if arabic else 'en'
+                with open(f'artifacts/axe_core_{section}_{label}.json', 'w', encoding='utf8') as f:
+                    json.dump(violations, f, indent=2)
+            self.assertEqual([], violations, f'Accessibility violations in {section}, Arabic={arabic}: {violations}')
 
 if __name__=='__main__':unittest.main()
