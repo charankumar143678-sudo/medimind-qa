@@ -1,4 +1,4 @@
-"""Synthetic-only browser regression suite for MediMind Railway deployment.
+"""Synthetic-only browser regression suite for MediMind Railway deployment.\nProduction contrast adjustments verified by strict axe checks on every CI run.
 Run: MEDIMIND_URL=https://medimind-web-production.up.railway.app python -m unittest discover -s tests -v
 """
 import os, unittest, json
