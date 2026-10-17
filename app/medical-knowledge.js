@@ -15,7 +15,7 @@ const MEDIMIND_KNOWLEDGE=(()=>{
  {id:'hba1c',type:'test',en:'Hemoglobin A1c',ar:'الهيموغلوبين السكري',syn:['HbA1c','A1C','السكر التراكمي'],specialty:'Laboratory medicine',summary:'Estimates average blood glucose over roughly two to three months; conditions affecting red blood cells may affect accuracy.',source:source('https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/')},
  {id:'urinalysis',type:'test',en:'Urinalysis',ar:'تحليل البول',syn:['urine test','UA','فحص البول'],specialty:'Laboratory medicine',summary:'Examines urine properties and substances to help assess urinary or other conditions.',source:source('https://medlineplus.gov/urinalysis.html')}
  ];
- const valid=r=>r&&typeof r.id==='string'&&/^[a-z0-9-]+$/.test(r.id)&&['condition','test'].includes(r.type)&&typeof r.en==='string'&&r.en.length>1&&typeof r.ar==='string'&&r.ar.length>1&&Array.isArray(r.syn)&&typeof r.specialty==='string'&&typeof r.summary==='string'&&r.summary.length>10&&r.source&&r.source.publisher.includes('MedlinePlus')&&/^https:\/\/medlineplus\.gov\/[a-z0-9/-]+\/?$/.test(r.source.url)&&/^\d{4}-\d\d-\d\d$/.test(r.source.verifiedOn);
+ const valid=r=>r&&typeof r.id==='string'&&/^[a-z0-9-]+$/.test(r.id)&&['condition','test'].includes(r.type)&&typeof r.en==='string'&&r.en.length>1&&typeof r.ar==='string'&&r.ar.length>1&&Array.isArray(r.syn)&&typeof r.specialty==='string'&&typeof r.summary==='string'&&r.summary.length>10&&r.source&&r.source.publisher.includes('MedlinePlus')&&/^https:\/\/medlineplus\.gov\/[a-z0-9/.-]+\/?$/.test(r.source.url)&&/^\d{4}-\d\d-\d\d$/.test(r.source.verifiedOn);
  const validateCatalog=(items)=>{
   if(!Array.isArray(items))return {ok:false,errors:['Catalog is not an array']};
   const ids=new Set(),errors=[];
