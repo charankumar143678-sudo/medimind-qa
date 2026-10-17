@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test health-core.test.mjs consultation-engine.test.mjs medical-knowledge.test.mjs adaptive-consultation.test.mjs consultation-dialogue.test.mjs"
+  }
+}
